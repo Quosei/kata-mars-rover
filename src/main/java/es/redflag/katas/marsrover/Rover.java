@@ -1,11 +1,24 @@
 package es.redflag.katas.marsrover;
 
+import java.util.*;
+
 public class Rover {
+
+    private static final String LEFT = "L";
+    private static final String RIGHT = "R";
+    private HashMap<String, Command> commandsList = new HashMap<String, Command>();
 
     private Compass compass;
 
+
     public Rover(){
         compass= new Compass();
+        setupCommands(compass);
+    }
+    private void setupCommands(Compass compass)
+    {
+        commandsList.put(LEFT,new SpinLeftCommand(compass) );
+        commandsList.put(RIGHT,new SpinRigthCommand(compass) );
     }
 
     public String orientation() {
@@ -13,70 +26,17 @@ public class Rover {
     }
 
     public void executeOrder(String commands) {
+        Command theCommand;
         for (char command : commands.toCharArray()) {
-            executeCommand(command);
+            theCommand = retrieveCommand(command);
+            if(theCommand!=null)
+                theCommand.execute();
         }
     }
 
-    private void executeCommand(char command) {
+    private Command retrieveCommand(char command) {
         String myCommand = String.valueOf(command);
-        if (myCommand.equals("L")) turnLeft();
-        if (myCommand.equals("R")) turnRight();
+        return commandsList.get(myCommand);
     }
-
-    private void turnRight() {
-        String orientation = compass.orientation();
-        switch (orientation){
-            case "N":
-                compass.changeDirection("E");
-                return;
-            case "E":
-                compass.changeDirection("S");
-                return;
-            case "S":
-                compass.changeDirection("W");
-                return;
-            case "W":
-                compass.changeDirection("N");
-                return;
-            default:
-                return;
-        }
-    }
-
-    private void turnLeft() {
-        String orientation = compass.orientation();
-        switch (orientation){
-            case "N":
-                compass.changeDirection("W");
-                return;
-            case "E":
-                compass.changeDirection("N");
-                return;
-            case "S":
-                compass.changeDirection("E");
-                return;
-            case "W":
-                compass.changeDirection("S");
-                return;
-            default:
-                return;
-        }
-    }
-
-    private class Compass{
-        private String facing;
-
-        public Compass(){
-            facing = "N";
-        }
-
-        public void changeDirection(String orientation){
-            facing = orientation;
-        }
-
-        public String orientation(){
-            return facing;
-        }
-    }
+    
 }
